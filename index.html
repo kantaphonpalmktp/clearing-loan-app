@@ -148,8 +148,8 @@
 <div class="wrap">
 
   <div class="masthead">
-    <div><h1>เคลียร์เงินยืมกิจกรรม</h1>
-      <p>อัปโหลดรูป → อ่านลงตารางอัตโนมัติ → รู้ว่าต้องโอนให้ใครเท่าไหร่</p></div>
+    <div><h1>ระบบจัดการการเงิน</h1>
+      <p>For Security Test SS Project</p></div>
     <div class="tools noprint">
       <button class="b sm" onclick="saveFile()">บันทึก</button>
       <button class="b sm" onclick="document.getElementById('openFile').click()">เปิดไฟล์</button>
@@ -168,10 +168,10 @@
   <!-- STEP 1 -->
   <section class="page card" id="page1">
     <h2>ข้อมูลกิจกรรม</h2>
-    <p class="sub">ชื่อกิจกรรม ผู้ดำเนินการ และช่วงเวลาเดินทาง</p>
+    <p class="sub">ชื่อผู้ดำเนินการ และช่วงเวลาเดินทางเพื่อทำกิจกรรม</p>
     <div class="grid g2">
-      <label class="f"><span>ชื่อกิจกรรม</span><input id="m_activity" oninput="onMeta()" placeholder="เช่น ตรวจสอบสนามบิน..."></label>
-      <label class="f"><span>ผู้ดำเนินการ / ผู้ถือเงิน</span><input id="m_borrower" list="rosterList" oninput="onMeta()" placeholder="พิมพ์หรือเลือกชื่อ"></label>
+      <label class="f"><span>ชื่อผู้ดำเนินการ</span><input id="m_activity" oninput="onMeta()" placeholder="เช่น VTSP VTCC"></label>
+      <label class="f"><span>ผู้ยืมเงินจากระบบ</span><input id="m_borrower" list="rosterList" oninput="onMeta()" placeholder="พิมพ์หรือเลือกชื่อ"></label>
       <label class="f"><span>วันที่ออกเดินทาง</span><input id="m_dep_d" type="date" onchange="onMeta()"></label>
       <label class="f"><span>เวลาออกเดินทาง</span><input id="m_dep_t" type="time" value="08:00" onchange="onMeta()"></label>
       <label class="f"><span>วันที่กลับถึง</span><input id="m_ret_d" type="date" onchange="onMeta()"></label>
@@ -183,12 +183,12 @@
 
   <!-- STEP 2 -->
   <section class="page card" id="page2">
-    <h2>รายชื่อ + ยอด</h2>
-    <p class="sub">อัปโหลดหรือถ่ายภาพหน้าจอระบบเบิกค่าใช้จ่ายแล้วกด “อ่านรูปลงตาราง” — ระบบจะเติมชื่อและยอดให้ จากนั้นเทียบยอดรวมกับรูปเพื่อยืนยัน</p>
+    <h2>รายชื่อสมาชิกในทีม</h2>
+    <p class="sub">อัปโหลดหรือถ่ายภาพหน้าจอระบบเบิกค่าใช้จ่ายแล้วกด “ดึงข้อมูลจากรูปลงตาราง” — ระบบจะเติมชื่อและยอดให้ จากนั้นเทียบยอดรวมกับรูปเพื่อยืนยัน</p>
     <div class="drop" id="drop" onclick="document.getElementById('imgFile').click()">
       <div><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></div>
       <b>คลิกหรือวางรูปที่นี่</b>
-      <div class="m">อัพโลหดไฟล์ภาพ .png .jpg หรือถ่ายภาพ</div>
+      <div class="m">อัพโหลดไฟล์ภาพ .png .jpg หรือถ่ายภาพ</div>
       <input type="file" id="imgFile" accept="image/*" style="display:none" onchange="loadImg(event)">
     </div>
     <img id="imgPrev" alt="">
@@ -285,7 +285,7 @@
     </div>
 
     <div class="card">
-      <h3 style="margin:0 0 4px">ผู้ถือเงินต้องโอนให้แต่ละคน</h3>
+      <h3 style="margin:0 0 4px">ผู้ยืมเงินต้องโอนให้แต่ละคน</h3>
       <p class="m" style="margin:0 0 15px">แจงว่าเงินที่โอนประกอบด้วยอะไรบ้าง และเหลือได้รับจริงเท่าไหร่</p>
       <div id="payout"></div>
     </div>
@@ -387,10 +387,10 @@ function calc(){
     if(taxi)recv.push(['ค่าพาหนะ / Taxi',taxi]);
     if(otherPersonal)recv.push(['ค่าใช้จ่ายอื่น ๆ',otherPersonal]);
     const adv=[];
-    if(isHP&&hotelActual)adv.push(['คืนค่าที่พักที่สำรองจ่าย',hotelActual]);
-    if(isFP&&flightActual)adv.push(['คืนค่าเครื่องบินที่สำรองจ่าย',flightActual]);
-    if(isCP&&cA)adv.push(['คืนค่าเช่ารถที่สำรองจ่าย',cA]);
-    if(isUP&&uA)adv.push(['คืนค่าน้ำมันที่สำรองจ่าย',uA]);
+    if(isHP&&hotelActual)adv.push(['ค่าที่พักที่สำรองจ่าย',hotelActual]);
+    if(isFP&&flightActual)adv.push(['ค่าเครื่องบินที่สำรองจ่าย',flightActual]);
+    if(isCP&&cA)adv.push(['ค่าเช่ารถที่สำรองจ่าย',cA]);
+    if(isUP&&uA)adv.push(['ค่าน้ำมันที่สำรองจ่าย',uA]);
     let pnote='';
     if(earmark)pnote='ค่าเช่ารถ/น้ำมัน หักจากช่องอื่น ๆ ที่ยืมมา '+fmt(otherRaw)+
       ' — ใช้จริง '+fmt(cuActual)+(r2(otherRaw-cuActual)>0?' • เหลือคืนบริษัท '+fmt(otherRaw-cuActual):
@@ -423,8 +423,8 @@ function calc(){
 function validate(c){
   const m=state.meta,ns=state.people.map(p=>p.name.trim()).filter(Boolean);
   if(!c.count)return{ok:false,msg:'ยังไม่มีรายชื่อ — อัปโหลดรูปหรือเพิ่มคนในขั้นที่ 2'};
-  if(!m.borrower)return{ok:false,msg:'ยังไม่ได้ระบุผู้ถือเงินในขั้นที่ 1'};
-  if(!ns.includes(m.borrower))return{ok:false,msg:'ชื่อผู้ถือเงินไม่ตรงกับรายชื่อในตาราง'};
+  if(!m.borrower)return{ok:false,msg:'ยังไม่ได้ระบุผู้ยืมเงินในขั้นที่ 1'};
+  if(!ns.includes(m.borrower))return{ok:false,msg:'ชื่อผู้ยืมเงินไม่ตรงกับรายชื่อในตาราง'};
   for(const[p,l] of [[c.hp,'ค่าที่พัก'],[c.fp,'ค่าเครื่องบิน'],[c.cp,'ค่าเช่ารถ'],[c.up,'ค่าน้ำมัน']])
     if(p&&!ns.includes(p))return{ok:false,msg:'ผู้จ่าย'+l+' ('+p+') ไม่มีในรายชื่อ'};
   if(r2(c.sumJ-c.sumI)!==0)return{ok:false,msg:'ยอดโอนไม่ตรงกับยอดใช้จริง — ตรวจข้อมูลอีกครั้ง'};
@@ -500,7 +500,7 @@ function updateDerived(){
   $('payout').innerHTML=c.active.length?c.active.map(r=>`
     <div class="pcard">
       <div class="phead">
-        <div class="pname">${esc(r.name)}${r.isBorrower?'<span class="tag self">ผู้ถือเงิน</span>':''}${r.advTot?'<span class="tag adv">สำรองจ่าย</span>':''}</div>
+        <div class="pname">${esc(r.name)}${r.isBorrower?'<span class="tag self">ผู้ยืมเงิน</span>':''}${r.advTot?'<span class="tag adv">สำรองจ่าย</span>':''}</div>
         <div class="pamt">${fmt(r.J)}</div></div>
       <div class="plines">
         ${r.recv.map(([l,v])=>`<div class="pl"><span>${l}</span><span>${fmt(v)}</span></div>`).join('')}
@@ -679,7 +679,7 @@ async function exportJpg(){
   const sub=[];
   if(m.dep_d&&m.ret_d)sub.push(thDate(m.dep_d)+' – '+thDate(m.ret_d));
   if(c.t.valid)sub.push((c.t.days%1?c.t.days.toFixed(1):c.t.days)+' วัน / '+c.t.nights+' คืน');
-  if(m.borrower)sub.push('ผู้ถือเงิน: '+m.borrower);
+  if(m.borrower)sub.push('ผู้ยืมเงิน: '+m.borrower);
   T(sub.join('  •  '),PAD,y+8,14,400,'#6e6e73');
   y+=34;
   // การ์ดรายคน
@@ -690,7 +690,7 @@ async function exportJpg(){
     T(r.name,L,cy,17.5,700,'#1d1d1f');
     let tw=x.measureText(r.name).width;
     if(r.isBorrower){x.fillStyle='#e8f1fd';rrect(L+tw+9,cy-13,68,19,10);x.fill();
-      T('ผู้ถือเงิน',L+tw+15,cy-0.5,11.5,700,'#0058b0');tw+=77;}
+      T('ผู้ยืมเงิน',L+tw+15,cy-0.5,11.5,700,'#0058b0');tw+=77;}
     if(r.advTot){x.fillStyle='#fff6e5';rrect(L+tw+9,cy-13,74,19,10);x.fill();
       T('สำรองจ่าย',L+tw+15,cy-0.5,11.5,700,'#a15c00');}
     T(fmt(r.J),R,cy+1,21,700,'#1d1d1f','right');
@@ -734,7 +734,7 @@ function buildText(){
   const c=calc(),m=state.meta,v=validate(c),L=[];
   L.push('สรุปเคลียร์เงินยืม — '+(m.activity||'(ไม่ระบุ)'));
   if(m.dep_d&&m.ret_d)L.push(thDate(m.dep_d)+' – '+thDate(m.ret_d)+' ('+(c.t.days%1?c.t.days.toFixed(1):c.t.days)+' วัน / '+c.t.nights+' คืน)');
-  L.push('ผู้ถือเงิน: '+(m.borrower||'-')+' • ยืมมา '+fmt(c.borrowed)+' บาท');
+  L.push('ผู้ยืมเงิน: '+(m.borrower||'-')+' • ยืมมา '+fmt(c.borrowed)+' บาท');
   const who=[['ค่าที่พัก',c.hp,c.hotelActual],['ค่าเครื่องบิน',c.fp,c.flightActual],['ค่าเช่ารถ',c.cp,c.cA],['ค่าน้ำมัน',c.up,c.uA]].filter(w=>w[1]&&w[2]);
   if(who.length){L.push('');L.push('ผู้สำรองจ่าย:');who.forEach(([l,p,a])=>L.push('• '+l+' — '+p+' '+fmt(a)));}
   L.push('');L.push('ยอดโอนให้แต่ละคน:');
@@ -743,7 +743,7 @@ function buildText(){
     r.recv.forEach(([l,v2])=>L.push('     · '+l+' '+fmt(v2)));
     r.adv.forEach(([l,v2])=>L.push('     · '+l+' '+fmt(v2)));
     L.push('     → ได้รับจริง '+fmt(r.net));});
-  L.push('');L.push('รวมโอนออก '+fmt(c.transferOut)+' • ผู้ถือเงินเก็บเอง '+fmt(c.selfKeep));
+  L.push('');L.push('รวมโอนออก '+fmt(c.transferOut)+' • ผู้ยืมเงินเก็บเอง '+fmt(c.selfKeep));
   const ret=c.retCompany;
   L.push(r2(ret)===0?'งบพอดี':(ret>0?'คืนบริษัท '+fmt(ret):'เบิกเพิ่มจากบริษัท '+fmt(-ret)));
   L.push('');L.push(v.ok?'✓ ยอดตรง':'! '+v.msg);
