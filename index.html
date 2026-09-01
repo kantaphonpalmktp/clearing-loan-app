@@ -195,7 +195,6 @@
     <div class="row" style="margin-top:13px">
       <button class="b pri" id="readBtn" onclick="autoRead()" style="display:none">อ่านรูปลงตาราง</button>
       <button class="b sm" id="rmImg" onclick="removeImg()" style="display:none">ลบรูป</button>
-      <button class="b sm" id="keyBtn" onclick="promptApiKey()">🔑 ตั้งค่า Key</button>
       <span class="m" id="ocrStatus"></span>
     </div>
     <hr class="sep">
@@ -598,18 +597,10 @@ const drop=$('drop');
 ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('drag');}));
 drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))readFileToImg(f);});
 window.addEventListener('paste',ev=>{const it=[...(ev.clipboardData||{}).items||[]].find(i=>i.type.startsWith('image/'));if(it)readFileToImg(it.getAsFile());});
-function promptApiKey(){
-  const cur=localStorage.getItem('gemini_key')||'';
-  const k=prompt('ใส่ Gemini API Key (ฟรี)\nสร้างได้ที่ aistudio.google.com/apikey',cur);
-  if(k!==null&&k.trim()){localStorage.setItem('gemini_key',k.trim());toast('บันทึกแล้ว');updateKeyBtn();}
-}
-function updateKeyBtn(){$('keyBtn').textContent=localStorage.getItem('gemini_key')?'🔑 เปลี่ยน Key':'🔑 ตั้งค่า Key';}
-
+const GEMINI_KEY='AQ.Ab8RN6KwLzxBC8uLledi63xXTpNxvvVZ9fcRhDN5whu3CC1kBw';
 async function autoRead(){
   const st=$('ocrStatus');
   if(!state.image){st.textContent='ยังไม่มีรูป';return;}
-  let ak=localStorage.getItem('gemini_key');
-  if(!ak){promptApiKey();ak=localStorage.getItem('gemini_key');if(!ak)return;}
   $('readBtn').disabled=true;
   st.innerHTML='<span class="spin"></span>กำลังอ่านรูปด้วย Gemini AI…';
   try{
@@ -624,7 +615,7 @@ async function autoRead(){
         +'กฎ: ใส่ชื่อเต็มรวมคำนำหน้า ตัวเลขเป็น string ไม่คั่นหลัก 0 ถ้าไม่มี ข้ามแถวรวม/สรุป'}
     ]}],generationConfig:{temperature:0,maxOutputTokens:2048}};
     const ep='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-    const res=await fetch(ep+'?key='+ak,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const res=await fetch(ep+'?key='+GEMINI_KEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const er=await res.json().catch(()=>({}));throw new Error(er.error?.message||'HTTP '+res.status);}
     const d=await res.json();
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
@@ -637,9 +628,7 @@ async function autoRead(){
     state.people=ppl;buildTable();refreshSelects();updateDerived();
     $('tb').querySelectorAll('tr').forEach(tr=>tr.classList.add('flash'));
     st.innerHTML='อ่านได้ <b>'+ppl.length+' คน</b> — ตรวจยอดรวมให้ตรงกับรูป';
-  }catch(e){
-    if(/KEY|401|403/i.test(e.message)){st.textContent='Key ไม่ถูกต้อง กดตั้งค่าใหม่';localStorage.removeItem('gemini_key');updateKeyBtn();}
-    else st.textContent='อ่านไม่สำเร็จ: '+(e.message||e);
+  }catch(e){st.textContent='อ่านไม่สำเร็จ: '+(e.message||e);
   }finally{$('readBtn').disabled=false;}
 }
 const normName=s=>String(s).replace(/\s+/g,'').replace(/(นางสาว|น\.ส\.|นาง|นาย|ว่าที่ร้อยตรี|ดร\.)/g,'').replace(/[^฀-๿]/g,'');
@@ -776,7 +765,7 @@ function toast(m){const d=document.createElement('div');d.textContent=m;
   if(!state){state=blankState();for(let i=0;i<5;i++)state.people.push(newPerson());}
   if(!state.people.length)for(let i=0;i<5;i++)state.people.push(newPerson());
   $('rosterList').innerHTML=DEFAULT_ROSTER.map(n=>`<option value="${esc(n)}">`).join('');
-  paint();goStep(state.step||1);updateKeyBtn();
+  paint();goStep(state.step||1);
 })();
 </script>
 </body>
