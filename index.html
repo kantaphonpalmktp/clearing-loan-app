@@ -188,13 +188,14 @@
     <div class="drop" id="drop" onclick="document.getElementById('imgFile').click()">
       <div><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></div>
       <b>คลิกหรือวางรูปที่นี่</b>
-      <div class="m">.png .jpg — ระบบอ่านในเครื่อง ไม่ส่งข้อมูลออก</div>
+      <div class="m">.png .jpg — ใช้ Gemini AI อ่านตัวเลขแม่นยำ</div>
       <input type="file" id="imgFile" accept="image/*" style="display:none" onchange="loadImg(event)">
     </div>
     <img id="imgPrev" alt="">
     <div class="row" style="margin-top:13px">
       <button class="b pri" id="readBtn" onclick="autoRead()" style="display:none">อ่านรูปลงตาราง</button>
       <button class="b sm" id="rmImg" onclick="removeImg()" style="display:none">ลบรูป</button>
+      <button class="b sm" id="keyBtn" onclick="promptApiKey()">🔑 ตั้งค่า Key</button>
       <span class="m" id="ocrStatus"></span>
     </div>
     <hr class="sep">
@@ -597,25 +598,50 @@ const drop=$('drop');
 ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('drag');}));
 drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))readFileToImg(f);});
 window.addEventListener('paste',ev=>{const it=[...(ev.clipboardData||{}).items||[]].find(i=>i.type.startsWith('image/'));if(it)readFileToImg(it.getAsFile());});
-function loadScript(src,ok,fail){if(window.Tesseract)return ok();
-  const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=fail;document.head.appendChild(s);}
-function autoRead(){
-  const st=$('ocrStatus');if(!state.image){st.textContent='ยังไม่มีรูป';return;}
-  $('readBtn').disabled=true;st.innerHTML='<span class="spin"></span>กำลังเตรียมตัวอ่าน…';
-  loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',()=>{
-    st.innerHTML='<span class="spin"></span>กำลังอ่านรูป…';
-    Tesseract.recognize(state.image,'tha+eng',{logger:mm=>{if(mm.status==='recognizing text')
-      st.innerHTML='<span class="spin"></span>กำลังอ่าน '+Math.round(mm.progress*100)+'%';}})
-      .then(({data})=>{const ppl=parseOcrText(data.text);$('readBtn').disabled=false;
-        if(!ppl.length){st.textContent='อ่านไม่พบตาราง — ลองรูปที่ชัดขึ้น หรือกดเพิ่มคนแล้วกรอกเอง';return;}
-        state.people=ppl;buildTable();refreshSelects();updateDerived();
-        $('tb').querySelectorAll('tr').forEach(tr=>tr.classList.add('flash'));
-        st.innerHTML='อ่านได้ <b>'+ppl.length+' คน</b> — ตรวจยอดรวมให้ตรงกับรูป';})
-      .catch(e=>{$('readBtn').disabled=false;st.textContent='อ่านไม่สำเร็จ: '+(e.message||e);});
-  },()=>{$('readBtn').disabled=false;st.textContent='โหลดตัวอ่านไม่สำเร็จ (ออฟไลน์?) — กรอกเองได้';});
+function promptApiKey(){
+  const cur=localStorage.getItem('gemini_key')||'';
+  const k=prompt('ใส่ Gemini API Key (ฟรี)\nสร้างได้ที่ aistudio.google.com/apikey',cur);
+  if(k!==null&&k.trim()){localStorage.setItem('gemini_key',k.trim());toast('บันทึกแล้ว');updateKeyBtn();}
 }
-const parseMoney=s=>parseInt(String(s).replace(/[^\d.,]/g,'').replace(/([.,]\d{1,2})$/,'').replace(/[.,]/g,'')||'0',10)||0;
-function extractMoney(l){const o=[];(l.match(/\d[\d.,]*/g)||[]).forEach(t=>{const v=parseMoney(t);if(v>=100&&v<=99999)o.push(v);});return o;}
+function updateKeyBtn(){$('keyBtn').textContent=localStorage.getItem('gemini_key')?'🔑 เปลี่ยน Key':'🔑 ตั้งค่า Key';}
+
+async function autoRead(){
+  const st=$('ocrStatus');
+  if(!state.image){st.textContent='ยังไม่มีรูป';return;}
+  let ak=localStorage.getItem('gemini_key');
+  if(!ak){promptApiKey();ak=localStorage.getItem('gemini_key');if(!ak)return;}
+  $('readBtn').disabled=true;
+  st.innerHTML='<span class="spin"></span>กำลังอ่านรูปด้วย Gemini AI…';
+  try{
+    const b64=state.image.split(',')[1];
+    const mt=(state.image.match(/data:([^;]+)/)||[])[1]||'image/jpeg';
+    const body={contents:[{parts:[
+      {inlineData:{mimeType:mt,data:b64}},
+      {text:'ดูตารางในรูปนี้ แล้วแยกข้อมูลรายคนออกมาเป็น JSON array\n'
+        +'คอลัมน์ตามลำดับ: ชื่อ-สกุล, เบี้ยเลี้ยง, ค่าที่พัก, ค่าเครื่องบิน, ค่าพาหนะ, อื่นๆ\n'
+        +'ตอบเฉพาะ JSON เท่านั้น ตัวอย่าง:\n'
+        +'[{"name":"นายสมชาย ใจดี","perDiem":"4800","hotel":"4500","airfare":"7040","taxi":"620","other":"0"}]\n'
+        +'กฎ: ใส่ชื่อเต็มรวมคำนำหน้า ตัวเลขเป็น string ไม่คั่นหลัก 0 ถ้าไม่มี ข้ามแถวรวม/สรุป'}
+    ]}],generationConfig:{temperature:0,maxOutputTokens:2048}};
+    const ep='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    const res=await fetch(ep+'?key='+ak,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){const er=await res.json().catch(()=>({}));throw new Error(er.error?.message||'HTTP '+res.status);}
+    const d=await res.json();
+    const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const js=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    const arr=JSON.parse(js);
+    if(!Array.isArray(arr)||!arr.length)throw new Error('ไม่พบข้อมูลในรูป');
+    const ppl=arr.map(it=>({name:matchRoster(it.name)||it.name||'',
+      perDiem:String(it.perDiem||0),hotel:String(it.hotel||0),
+      airfare:String(it.airfare||0),taxi:String(it.taxi||0),other:String(it.other||0)}));
+    state.people=ppl;buildTable();refreshSelects();updateDerived();
+    $('tb').querySelectorAll('tr').forEach(tr=>tr.classList.add('flash'));
+    st.innerHTML='อ่านได้ <b>'+ppl.length+' คน</b> — ตรวจยอดรวมให้ตรงกับรูป';
+  }catch(e){
+    if(/KEY|401|403/i.test(e.message)){st.textContent='Key ไม่ถูกต้อง กดตั้งค่าใหม่';localStorage.removeItem('gemini_key');updateKeyBtn();}
+    else st.textContent='อ่านไม่สำเร็จ: '+(e.message||e);
+  }finally{$('readBtn').disabled=false;}
+}
 const normName=s=>String(s).replace(/\s+/g,'').replace(/(นางสาว|น\.ส\.|นาง|นาย|ว่าที่ร้อยตรี|ดร\.)/g,'').replace(/[^฀-๿]/g,'');
 function approxSub(pat,text){const m=pat.length,n=text.length;if(!m)return 0;if(!n)return m;
   let pr=Array(n+1).fill(0),cu=Array(n+1).fill(0);
@@ -624,22 +650,7 @@ function approxSub(pat,text){const m=pat.length,n=text.length;if(!m)return 0;if(
 function matchRoster(raw){const t=normName(raw);if(t.length<3)return null;let best=null,bs=0;
   for(const nm of DEFAULT_ROSTER){const p=normName(nm),sim=1-approxSub(p,t)/p.length;if(sim>bs){bs=sim;best=nm;}}
   return bs>=.6?best:null;}
-const cleanRaw=s=>String(s).replace(/^[\s\d.\-]+/,'').replace(/(หัวหน้า|พนักงาน|ปฏิบัติงาน|นักวิชาการ|ระดับ|ประเทศ|ไทย|ผู้).*$/,'').trim();
-function parseOcrText(text){
-  const bad=/(งบ|เดินทาง|คงเหลือ|ประมาณ|ระดับสิทธิ|ลำดับ|รวม|ยืมได|บาท)/;
-  const out=[];let pending='';
-  for(const line of text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean)){
-    const nums=extractMoney(line),thai=(line.match(/[฀-๿]+/g)||[]).join(' ').trim();
-    if(nums.length>=3){
-      const raw=(thai.replace(/\s+/g,'').length>=4)?thai:pending;
-      if(!raw||normName(raw).length<2||bad.test(raw)){pending='';continue;}
-      const[perDiem,hotel,airfare,taxi,other]=[0,1,2,3,4].map(i=>nums[i]!=null?String(nums[i]):'');
-      out.push({name:matchRoster(raw)||cleanRaw(raw)||('คนที่ '+(out.length+1)),perDiem,hotel,airfare,taxi,other});
-      pending='';
-    }else if(thai&&!nums.length&&thai.replace(/\s+/g,'').length<=30&&!bad.test(thai))pending=thai;
-  }
-  return out;
-}
+
 
 /* ===== EXPORT JPG (วาดเองบน canvas — ไม่ง้อไลบรารี ใช้ออฟไลน์ได้) ===== */
 async function exportJpg(){
@@ -765,7 +776,7 @@ function toast(m){const d=document.createElement('div');d.textContent=m;
   if(!state){state=blankState();for(let i=0;i<5;i++)state.people.push(newPerson());}
   if(!state.people.length)for(let i=0;i<5;i++)state.people.push(newPerson());
   $('rosterList').innerHTML=DEFAULT_ROSTER.map(n=>`<option value="${esc(n)}">`).join('');
-  paint();goStep(state.step||1);
+  paint();goStep(state.step||1);updateKeyBtn();
 })();
 </script>
 </body>
