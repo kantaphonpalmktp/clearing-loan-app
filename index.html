@@ -614,7 +614,7 @@ async function autoRead(){
         +'[{"name":"นายสมชาย ใจดี","perDiem":"4800","hotel":"4500","airfare":"7040","taxi":"620","other":"0"}]\n'
         +'กฎ: ใส่ชื่อเต็มรวมคำนำหน้า ตัวเลขเป็น string ไม่คั่นหลัก 0 ถ้าไม่มี ข้ามแถวรวม/สรุป'}
     ]}],generationConfig:{temperature:0,maxOutputTokens:2048}};
-    const ep='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    const ep='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
     const res=await fetch(ep+'?key='+GEMINI_KEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const er=await res.json().catch(()=>({}));throw new Error(er.error?.message||'HTTP '+res.status);}
     const d=await res.json();
