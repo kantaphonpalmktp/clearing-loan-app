@@ -619,9 +619,11 @@ async function autoRead(){
     const res=await fetch(ep+'?key='+GEMINI_KEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const er=await res.json().catch(()=>({}));throw new Error(er.error?.message||'HTTP '+res.status);}
     const d=await res.json();
+    console.log('Gemini response:',JSON.stringify(d).slice(0,500));
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    if(!raw)throw new Error('Gemini ตอบว่าง: '+JSON.stringify(d).slice(0,300));
     const m=raw.match(/\[[\s\S]*\]/);
-    if(!m)throw new Error('ไม่พบข้อมูลในรูป');
+    if(!m)throw new Error('ไม่พบ JSON ใน response: '+raw.slice(0,200));
     const arr=JSON.parse(m[0]);
     if(!Array.isArray(arr)||!arr.length)throw new Error('ไม่พบข้อมูลในรูป');
     const ppl=arr.map(it=>({name:matchRoster(it.name)||it.name||'',
