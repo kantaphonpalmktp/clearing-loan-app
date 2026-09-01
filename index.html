@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เคลียร์เงินยืมกิจกรรม</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#86868b;
+    --line:#e3e3e6; --fill:#f5f5f7;
+    --blue:#0071e3; --blue-d:#0058b0; --blue-soft:#e8f1fd;
+    --green:#1d9d5a; --green-bg:#e9f7ef;
+    --red:#d70015; --red-bg:#fdeceb;
+    --amber:#a15c00; --amber-bg:#fff6e5;
+    --r:18px; --sh:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable","Segoe UI","Sarabun","Noto Sans Thai",sans-serif;
+    background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+  .wrap{max-width:940px;margin:0 auto;padding:22px 20px 130px}
+  .masthead{margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .masthead h1{font-size:27px;font-weight:700;margin:0;letter-spacing:-.03em}
+  .masthead p{margin:3px 0 0;color:var(--ink2);font-size:14px}
+  .tools{display:flex;gap:8px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;font-weight:600;border:0;cursor:pointer;transition:.18s cubic-bezier(.4,0,.2,1);letter-spacing:-.01em}
+  .b{border-radius:980px;padding:9px 17px;background:rgba(0,0,0,.05);color:var(--ink)}
+  .b:hover{background:rgba(0,0,0,.09)}
+  .b.pri{background:var(--blue);color:#fff} .b.pri:hover{background:var(--blue-d)}
+  .b.lg{padding:12px 26px;font-size:15px} .b.sm{padding:6px 13px;font-size:13px}
+  .b.dgr{background:transparent;color:var(--ink3);padding:5px 9px;border-radius:8px;font-size:15px;line-height:1}
+  .b.dgr:hover{background:var(--red-bg);color:var(--red)}
+  .b:disabled{opacity:.4;cursor:default}
+  .seg{display:flex;background:#e8e8ed;border-radius:13px;padding:3px;gap:2px;margin-bottom:20px}
+  .segbtn{flex:1;border-radius:10px;padding:9px 6px;background:transparent;color:var(--ink2);font-size:13px;font-weight:600;
+    display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+  .segbtn .k{font-size:11px;color:var(--ink3);font-weight:700}
+  .segbtn .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .segbtn:hover{color:var(--ink)}
+  .segbtn.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+  .segbtn.on .k{color:var(--blue)} .segbtn.ok .k::after{content:" ✓";color:var(--green)}
+  @media(max-width:620px){.segbtn .t{font-size:11px}}
+  .card{background:var(--card);border-radius:var(--r);padding:24px;margin-bottom:16px;box-shadow:var(--sh)}
+  .card>h2{font-size:20px;font-weight:700;margin:0 0 4px;letter-spacing:-.02em}
+  .card>.sub{color:var(--ink2);font-size:13.5px;margin:0 0 20px}
+  h3{font-size:15px;font-weight:700;margin:0 0 12px;letter-spacing:-.01em}
+  .page{display:none} .page.active{display:block}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:760px){.g2,.g3{grid-template-columns:1fr}}
+  label.f{display:flex;flex-direction:column;gap:6px}
+  label.f>span{font-size:12.5px;font-weight:600;color:var(--ink2);letter-spacing:0}
+  input,select{font-family:inherit;font-size:15px;padding:11px 13px;border:1px solid transparent;border-radius:11px;
+    background:var(--fill);color:var(--ink);width:100%;transition:.15s;letter-spacing:-.01em}
+  input::placeholder{color:var(--ink3)}
+  input:hover,select:hover{background:#eeeef0}
+  input:focus,select:focus{outline:0;background:#fff;border-color:var(--blue);box-shadow:0 0 0 3.5px rgba(0,113,227,.16)}
+  input.money{text-align:right;font-variant-numeric:tabular-nums}
+  input:disabled{opacity:.55;cursor:not-allowed}
+  select{appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 8l3-3.5' stroke='%236e6e73' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;background-size:13px;padding-right:34px}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+  .chip{background:var(--fill);border-radius:11px;padding:9px 14px;font-size:13px;color:var(--ink2)}
+  .chip b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+  .drop{border:1.5px dashed #c7c7cc;border-radius:15px;padding:34px 20px;text-align:center;cursor:pointer;transition:.18s;background:var(--fill)}
+  .drop:hover,.drop.drag{border-color:var(--blue);background:var(--blue-soft)}
+  .drop b{font-size:15px} .drop .m{font-size:12.5px;color:var(--ink3);margin-top:3px}
+  #imgPrev{max-width:100%;max-height:330px;border-radius:13px;display:none;margin-top:14px;box-shadow:var(--sh)}
+  .scroll{overflow-x:auto;margin:0 -4px}
+  table{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
+  th,td{padding:8px 7px;text-align:right;white-space:nowrap}
+  th{font-size:11.5px;font-weight:700;color:var(--ink3);padding-bottom:9px;border-bottom:1px solid var(--line)}
+  th.l,td.l{text-align:left}
+  td input{padding:9px 11px;min-width:92px;font-size:14px}
+  td input.nm{min-width:190px;text-align:left}
+  tfoot td{padding-top:14px;border-top:1.5px solid var(--line);font-weight:700;font-variant-numeric:tabular-nums;font-size:14.5px}
+  .flash{animation:fl 1.4s ease-out}
+  @keyframes fl{0%{background:#fff3d6}100%{background:transparent}}
+  /* borrow total block */
+  .btot{margin-top:20px;background:var(--blue-soft);border-radius:15px;padding:18px 20px;display:flex;
+    justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+  .btot .lab{font-size:13.5px;color:var(--blue-d);font-weight:600}
+  .btot .val{font-size:29px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--blue-d)}
+  .btot .rt{min-width:220px}
+  .btot .rt label{display:flex;flex-direction:column;gap:5px}
+  .btot .rt span{font-size:12px;color:var(--blue-d);font-weight:600}
+  .btot input{background:rgba(255,255,255,.75)}
+  /* expense sections */
+  .xsec{border:1px solid var(--line);border-radius:15px;overflow:hidden;margin-bottom:14px}
+  .xhead{display:flex;align-items:center;gap:11px;padding:14px 18px;background:var(--fill);border-bottom:1px solid var(--line)}
+  .xhead .xn{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .xhead .xt{font-weight:700;font-size:15.5px}
+  .xhead .xr{margin-left:auto;font-size:12px;color:var(--ink3);text-align:right}
+  .xbody{padding:18px}
+  .rule{font-size:12.5px;color:var(--ink2);background:var(--amber-bg);color:var(--amber);border-radius:10px;padding:9px 13px;margin-bottom:15px}
+  .note{font-size:13px;padding:11px 14px;border-radius:11px;background:var(--fill);color:var(--ink2);margin-top:14px}
+  .note.pos{background:var(--green-bg);color:#146c40} .note.neg{background:var(--red-bg);color:#a3000f}
+  .chk{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink);cursor:pointer;
+    background:var(--fill);padding:12px 14px;border-radius:11px;margin-bottom:15px}
+  .chk input{width:18px;height:18px;flex:0 0 auto;margin-top:1px;accent-color:var(--blue)}
+  .chk .d{font-size:12px;color:var(--ink2);margin-top:2px}
+  .banner{padding:14px 18px;border-radius:14px;font-weight:600;margin-bottom:20px;display:flex;gap:11px;align-items:center;font-size:14.5px}
+  .banner.ok{background:var(--green-bg);color:#146c40} .banner.bad{background:var(--red-bg);color:#a3000f}
+  .banner .i{font-size:17px}
+  .who{display:flex;flex-direction:column;gap:1px;background:var(--line);border-radius:13px;overflow:hidden}
+  .who .r{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;padding:13px 16px}
+  .who .r .c{color:var(--ink2);font-size:13.5px} .who .r .p{font-weight:600}
+  .who .r .a{font-weight:700;font-variant-numeric:tabular-nums}
+  .who .r.none .p,.who .r.none .a{color:var(--ink3);font-weight:500}
+  .pcard{border:1px solid var(--line);border-radius:15px;padding:16px 18px;margin-bottom:11px;background:#fff}
+  .phead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:11px}
+  .pname{font-weight:700;font-size:15.5px}
+  .pamt{font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+  .plines{display:flex;flex-direction:column;gap:5px;font-size:13.5px}
+  .pl{display:flex;justify-content:space-between;gap:12px;color:var(--ink2)}
+  .pl span:last-child{font-variant-numeric:tabular-nums;color:var(--ink)}
+  .pl.adv{color:var(--amber)} .pl.adv span:last-child{color:var(--amber);font-weight:600}
+  .pl.ded{color:var(--red)} .pl.ded span:last-child{color:var(--red);font-weight:600}
+  .pnote{font-size:12px;color:var(--ink3);margin-top:8px;background:var(--fill);padding:8px 11px;border-radius:9px}
+  .pnet{display:flex;justify-content:space-between;gap:12px;margin-top:11px;padding-top:11px;border-top:1px dashed var(--line);font-size:14px}
+  .pnet b{font-variant-numeric:tabular-nums;font-size:16px;color:var(--green)}
+  .tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:980px;font-weight:700;margin-left:7px;vertical-align:1px}
+  .tag.self{background:var(--blue-soft);color:var(--blue-d)}
+  .tag.adv{background:var(--amber-bg);color:var(--amber)}
+  .sl{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px;gap:12px}
+  .sl:last-child{border-bottom:0} .sl b{font-variant-numeric:tabular-nums;font-weight:700}
+  .sl.hi{padding-top:15px} .sl.hi b{font-size:21px;letter-spacing:-.02em}
+  .pos{color:var(--green)} .neg{color:var(--red)}
+  .nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid rgba(0,0,0,.08);padding:12px 20px;z-index:30}
+  .nav .in{max-width:940px;margin:0 auto;width:100%;display:flex;align-items:center;gap:14px}
+  .nav .h{flex:1;text-align:center;font-size:12.5px;color:var(--ink3)}
+  @media(max-width:620px){.nav .h{display:none}}
+  textarea{width:100%;min-height:130px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Sarabun",monospace;font-size:12.5px;
+    padding:13px;border:1px solid var(--line);border-radius:12px;resize:vertical;background:var(--fill);color:var(--ink)}
+  textarea:focus{outline:0;background:#fff;border-color:var(--blue);box-shadow:0 0 0 3.5px rgba(0,113,227,.16)}
+  .m{font-size:12.5px;color:var(--ink3)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center} .sp{flex:1}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid #d2d2d7;border-top-color:var(--blue);border-radius:50%;
+    animation:sp .7s linear infinite;vertical-align:-2px;margin-right:7px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  hr.sep{border:0;border-top:1px solid var(--line);margin:22px 0}
+  @media print{.noprint{display:none!important}.page{display:block!important}.nav{display:none}body{background:#fff}.card{box-shadow:none;border:1px solid #ddd}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div><h1>เคลียร์เงินยืมกิจกรรม</h1>
+      <p>อัปโหลดรูป → อ่านลงตารางอัตโนมัติ → รู้ว่าต้องโอนให้ใครเท่าไหร่</p></div>
+    <div class="tools noprint">
+      <button class="b sm" onclick="saveFile()">บันทึก</button>
+      <button class="b sm" onclick="document.getElementById('openFile').click()">เปิดไฟล์</button>
+      <button class="b sm" onclick="newProject()">เริ่มใหม่</button>
+      <input type="file" id="openFile" accept=".json" style="display:none" onchange="openFile(event)">
+    </div>
+  </div>
+
+  <div class="seg noprint">
+    <button class="segbtn" onclick="goStep(1)"><span class="k">1</span><span class="t">กิจกรรม</span></button>
+    <button class="segbtn" onclick="goStep(2)"><span class="k">2</span><span class="t">รายชื่อ + ยอด</span></button>
+    <button class="segbtn" onclick="goStep(3)"><span class="k">3</span><span class="t">ค่าใช้จ่าย</span></button>
+    <button class="segbtn" onclick="goStep(4)"><span class="k">4</span><span class="t">สรุป</span></button>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="page card" id="page1">
+    <h2>ข้อมูลกิจกรรม</h2>
+    <p class="sub">ชื่อกิจกรรม ผู้ดำเนินการ และช่วงเวลาเดินทาง</p>
+    <div class="grid g2">
+      <label class="f"><span>ชื่อกิจกรรม</span><input id="m_activity" oninput="onMeta()" placeholder="เช่น ตรวจสอบสนามบิน..."></label>
+      <label class="f"><span>ผู้ดำเนินการ / ผู้ถือเงิน</span><input id="m_borrower" list="rosterList" oninput="onMeta()" placeholder="พิมพ์หรือเลือกชื่อ"></label>
+      <label class="f"><span>วันที่ออกเดินทาง</span><input id="m_dep_d" type="date" onchange="onMeta()"></label>
+      <label class="f"><span>เวลาออกเดินทาง</span><input id="m_dep_t" type="time" value="08:00" onchange="onMeta()"></label>
+      <label class="f"><span>วันที่กลับถึง</span><input id="m_ret_d" type="date" onchange="onMeta()"></label>
+      <label class="f"><span>เวลากลับถึง</span><input id="m_ret_t" type="time" value="17:00" onchange="onMeta()"></label>
+    </div>
+    <div class="chips" id="chips"></div>
+    <datalist id="rosterList"></datalist>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="page card" id="page2">
+    <h2>รายชื่อ + ยอด</h2>
+    <p class="sub">อัปโหลดรูปแล้วกด “อ่านรูปลงตาราง” — ระบบจะเติมชื่อและยอดให้ จากนั้นเทียบยอดรวมกับรูปเพื่อยืนยัน</p>
+    <div class="drop" id="drop" onclick="document.getElementById('imgFile').click()">
+      <div><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></div>
+      <b>คลิกหรือวางรูปที่นี่</b>
+      <div class="m">.png .jpg — ระบบอ่านในเครื่อง ไม่ส่งข้อมูลออก</div>
+      <input type="file" id="imgFile" accept="image/*" style="display:none" onchange="loadImg(event)">
+    </div>
+    <img id="imgPrev" alt="">
+    <div class="row" style="margin-top:13px">
+      <button class="b pri" id="readBtn" onclick="autoRead()" style="display:none">อ่านรูปลงตาราง</button>
+      <button class="b sm" id="rmImg" onclick="removeImg()" style="display:none">ลบรูป</button>
+      <span class="m" id="ocrStatus"></span>
+    </div>
+    <hr class="sep">
+    <div class="row" style="margin-bottom:12px">
+      <h3 style="margin:0">ตารางรายคน</h3><span class="m">แก้ไขได้ทุกช่อง</span>
+      <div class="sp"></div>
+      <button class="b sm" onclick="addPerson()">＋ เพิ่มคน</button>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th class="l">ชื่อ</th><th>เบี้ยเลี้ยง</th><th>ค่าที่พัก</th><th>ค่าเครื่องบิน</th><th>ค่าพาหนะ</th><th>อื่น ๆ</th><th class="noprint"></th></tr></thead>
+        <tbody id="tb"></tbody>
+        <tfoot><tr id="tfoot"></tr></tfoot>
+      </table>
+    </div>
+    <div class="btot">
+      <div>
+        <div class="lab">ยอดยืมรวมทั้งหมดจากตาราง</div>
+        <div class="val" id="p2_total">0.00</div>
+        <div class="m" id="p2_break" style="margin-top:3px"></div>
+      </div>
+      <div class="rt">
+        <label><span>ยอดที่ยืมจริงจากบริษัท (ปรับเองได้)</span>
+          <input id="m_amount" class="money" inputmode="decimal" oninput="amountTouch=true;onMeta()"></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="page card" id="page3">
+    <h2>ค่าใช้จ่ายที่มีคนสำรองจ่าย</h2>
+    <p class="sub">ระบุว่าใครออกเงินแทนทีมไปก่อน และจ่ายจริงเท่าไหร่ — ระบบจะคืนเงินส่วนนี้ให้ผู้จ่ายในหน้าสรุป</p>
+
+    <div class="xsec">
+      <div class="xhead"><div class="xn">1</div><div class="xt">ค่าที่พัก</div><div class="xr" id="x1r"></div></div>
+      <div class="xbody">
+        <div class="rule">เงินเหลือ → เฉลี่ยคืนสมาชิกทุกคนเท่า ๆ กัน (ไม่คืนบริษัท) &nbsp;•&nbsp; จ่ายเกิน → เบิกบริษัทเพิ่มแล้วโอนให้ผู้จ่าย</div>
+        <div class="grid g3">
+          <label class="f"><span>ใครเป็นคนจ่าย</span><select id="h_payer" onchange="onMeta()"></select></label>
+          <label class="f"><span>วงเงินที่ยืมมา</span><input id="h_alloc" class="money" inputmode="decimal" oninput="touch('hotel');onMeta()"></label>
+          <label class="f"><span>จ่ายจริง</span><input id="h_actual" class="money" inputmode="decimal" oninput="onMeta()"></label>
+        </div>
+        <div id="h_note" class="note"></div>
+      </div>
+    </div>
+
+    <div class="xsec">
+      <div class="xhead"><div class="xn">2</div><div class="xt">ค่าเครื่องบิน</div><div class="xr" id="x2r"></div></div>
+      <div class="xbody">
+        <div class="rule">เงินเหลือ → คืนบริษัท &nbsp;•&nbsp; จ่ายเกิน → เบิกบริษัทเพิ่มแล้วโอนให้ผู้จ่าย</div>
+        <div class="grid g3">
+          <label class="f"><span>ใครเป็นคนจ่าย</span><select id="f_payer" onchange="onMeta()"></select></label>
+          <label class="f"><span>วงเงินที่ยืมมา</span><input id="f_alloc" class="money" inputmode="decimal" oninput="touch('flight');onMeta()"></label>
+          <label class="f"><span>จ่ายจริง</span><input id="f_actual" class="money" inputmode="decimal" oninput="onMeta()"></label>
+        </div>
+        <div id="f_note" class="note"></div>
+      </div>
+    </div>
+
+    <div class="xsec">
+      <div class="xhead"><div class="xn">3</div><div class="xt">ค่าเช่ารถ + ค่าน้ำมัน</div><div class="xr" id="x3r"></div></div>
+      <div class="xbody">
+        <label class="chk">
+          <input type="checkbox" id="cu_fromOther" onchange="onMeta()">
+          <span><b>หักจากช่อง “อื่น ๆ” ที่ยืมมาของผู้จ่าย</b>
+            <div class="d">ปกติค่าเช่ารถและน้ำมันถูกรวมอยู่ในยอด “อื่น ๆ” ที่ยืมมาแล้ว — เปิดไว้ระบบจะใช้ยอดนั้นเป็นวงเงิน ไม่ต้องกรอกซ้ำ</div></span>
+        </label>
+        <div class="grid g2">
+          <label class="f"><span>ผู้จ่ายค่าเช่ารถ</span><select id="c_payer" onchange="onMeta()"></select></label>
+          <label class="f"><span>ผู้จ่ายค่าน้ำมัน</span><select id="u_payer" onchange="onMeta()"></select></label>
+          <label class="f"><span>ค่าเช่ารถ — จ่ายจริง</span><input id="c_actual" class="money" inputmode="decimal" oninput="onMeta()"></label>
+          <label class="f"><span>ค่าน้ำมัน — จ่ายจริง</span><input id="u_actual" class="money" inputmode="decimal" oninput="onMeta()"></label>
+          <label class="f" id="cAllocWrap"><span>ค่าเช่ารถ — วงเงินที่ยืมมา</span><input id="c_alloc" class="money" inputmode="decimal" oninput="onMeta()"></label>
+          <label class="f" id="uAllocWrap"><span>ค่าน้ำมัน — วงเงินที่ยืมมา</span><input id="u_alloc" class="money" inputmode="decimal" oninput="onMeta()"></label>
+        </div>
+        <div id="cu_note" class="note"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="page" id="page4">
+    <div class="card">
+      <div id="banner" class="banner ok"><span class="i">✓</span><span id="bannerText">พร้อม</span></div>
+      <h3>ใครสำรองจ่ายค่าอะไรไปบ้าง</h3>
+      <div class="who" id="whoPaid"></div>
+      <p class="m" style="margin-top:11px">ยอดเหล่านี้ผู้จ่ายได้คืนเต็มจำนวน จึงไม่ถือเป็นเงินที่ได้รับส่วนตัว</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 4px">ผู้ถือเงินต้องโอนให้แต่ละคน</h3>
+      <p class="m" style="margin:0 0 15px">แจงว่าเงินที่โอนประกอบด้วยอะไรบ้าง และเหลือได้รับจริงเท่าไหร่</p>
+      <div id="payout"></div>
+    </div>
+
+    <div class="card">
+      <h3>สรุปเคลียร์กับบริษัท</h3>
+      <div class="sl"><span>ยอดที่ยืมมา</span><b id="s_borrow">0.00</b></div>
+      <div class="sl"><span>ยอดใช้จริงทั้งทีม</span><b id="s_actual">0.00</b></div>
+      <div class="sl hi"><span id="s_retlabel">คืนบริษัท</span><b id="s_ret">0.00</b></div>
+      <div class="row noprint" style="margin-top:18px">
+        <button class="b pri" onclick="exportJpg()">📷 บันทึกเป็นรูป</button>
+        <button class="b sm" onclick="copyText()">คัดลอกข้อความ</button>
+        <button class="b sm" onclick="printSummary()">พิมพ์ / PDF</button>
+        <button class="b sm" onclick="exportCsv()">CSV</button>
+        <button class="b sm" onclick="saveFile()">บันทึกไฟล์งาน</button>
+      </div>
+      <textarea id="shareText" class="noprint" style="margin-top:14px" placeholder="กด “คัดลอกข้อความ” เพื่อสร้างข้อความสำหรับส่งในกลุ่ม"></textarea>
+    </div>
+  </section>
+</div>
+
+<div class="nav noprint"><div class="in">
+  <button class="b" id="backBtn" onclick="prevStep()">← ย้อนกลับ</button>
+  <div class="h" id="navHint"></div>
+  <button class="b pri lg" id="nextBtn" onclick="nextStep()">ถัดไป →</button>
+</div></div>
+
+<script>
+const DEFAULT_ROSTER=[
+ "นางสาวสุณิชา สู่ศิริ","นางสาวนารี พีระวุฒิพงศ์","นายศิวพร รัตนสุวรรณ","นายลัคนัย นิติวัฒนวิจารณ์",
+ "นางสาวศิริลักษณ์ วาทะวัฒนะ","นายสุทธิพงษ์ อัชฌาพงศ์","นายวณัจกรณ์ มหาเทียน","นายอิทธิพล โพธิ์อยู่",
+ "นายพงศกร เที่ยงตรง","นางสาวอภันตรี สอนวิทย์","นายกันตภณ ภูญชา","นายพีรวิชช์ อนันตศิรรัตน์"];
+
+const $=id=>document.getElementById(id);
+const num=v=>{if(v==null)return 0;const n=parseFloat(String(v).replace(/,/g,'').trim());return isNaN(n)?0:n;};
+const fmt=n=>(Math.round((n+Number.EPSILON)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function setVal(el,v){if(el&&document.activeElement!==el&&el.value!==v)el.value=v;}
+
+let state=null,step=1,amountTouch=false;
+const blankState=()=>({version:5,
+  meta:{activity:"",borrower:"",amount:"",dep_d:"",dep_t:"08:00",ret_d:"",ret_t:"17:00"},
+  hotel:{payer:"",alloc:"",actual:"",touched:false},
+  flight:{payer:"",alloc:"",actual:"",touched:false},
+  car:{payer:"",alloc:"",actual:""},
+  fuel:{payer:"",alloc:"",actual:""},
+  cuFromOther:true, people:[],image:"",step:1});
+const newPerson=(name="")=>({name,perDiem:"",hotel:"",airfare:"",taxi:"",other:""});
+
+function computeTime(){
+  const m=state.meta;let hours=0,days=0,nights=0,valid=false;
+  if(m.dep_d&&m.ret_d){
+    const dep=new Date(m.dep_d+"T"+(m.dep_t||"00:00")),ret=new Date(m.ret_d+"T"+(m.ret_t||"00:00"));
+    if(!isNaN(dep)&&!isNaN(ret)&&ret>=dep){valid=true;hours=(ret-dep)/36e5;
+      const full=Math.floor(hours/24),rem=hours-full*24;days=full+(rem>8?1:(rem>4?.5:0));
+      nights=Math.round((new Date(m.ret_d)-new Date(m.dep_d))/864e5);}}
+  return{hours,days,nights,valid};
+}
+
+function calc(){
+  const m=state.meta,t=computeTime();
+  const act0=state.people.filter(p=>p.name.trim());
+  const count=act0.length;
+  const sumHotelImg=act0.reduce((a,p)=>a+num(p.hotel),0);
+  const sumAirImg=act0.reduce((a,p)=>a+num(p.airfare),0);
+  const sumPerDiemImg=act0.reduce((a,p)=>a+num(p.perDiem),0);
+  const sumTaxiImg=act0.reduce((a,p)=>a+num(p.taxi),0);
+  const sumOtherImg=act0.reduce((a,p)=>a+num(p.other),0);
+
+  const hotelAlloc=state.hotel.touched?num(state.hotel.alloc):sumHotelImg;
+  const hotelActual=num(state.hotel.actual);
+  const hotelDiff=hotelAlloc-hotelActual;
+  const hotelShare=(hotelDiff>0&&count)?hotelDiff/count:0;
+  const flightAlloc=state.flight.touched?num(state.flight.alloc):sumAirImg;
+  const flightActual=num(state.flight.actual);
+  const cA=num(state.car.actual),uA=num(state.fuel.actual);
+  const fromOther=!!state.cuFromOther;
+  const hp=state.hotel.payer,fp=state.flight.payer,cp=state.car.payer,up=state.fuel.payer;
+  // วงเงินเช่ารถ/น้ำมัน: หักจาก "อื่นๆ" ของผู้จ่าย หรือกรอกเอง
+  const otherOf=n=>{const p=act0.find(x=>x.name===n);return p?num(p.other):0;};
+  const cB=fromOther?(cp?otherOf(cp):0):num(state.car.alloc);
+  const uB=fromOther?(up&&up!==cp?otherOf(up):(up===cp?0:0)):num(state.fuel.alloc);
+
+  const rows=state.people.map(p=>{
+    if(!p.name.trim())return{empty:true};
+    const perDiem=num(p.perDiem),taxi=num(p.taxi),otherRaw=num(p.other);
+    const D=sumHotelImg>0?hotelAlloc*(num(p.hotel)/sumHotelImg):(count?hotelAlloc/count:0);
+    const isHP=p.name===hp,isFP=p.name===fp,isCP=p.name===cp,isUP=p.name===up;
+    // ค่าเช่ารถ/น้ำมันที่คนนี้ต้องจ่ายจริง
+    const cuActual=(isCP?cA:0)+(isUP?uA:0);
+    const earmark=fromOther&&(isCP||isUP);          // "อื่นๆ" ถูกกันไว้จ่ายค่ารถ
+    const otherPersonal=earmark?0:otherRaw;          // เหลือเป็นเงินส่วนตัวเท่าไหร่
+    const cuAlloc=earmark?otherRaw:((isCP?cB:0)+(isUP?uB:0));
+
+    const recv=[];
+    if(perDiem)recv.push(['เบี้ยเลี้ยง',perDiem]);
+    if(hotelShare)recv.push(['ส่วนต่างค่าที่พักที่ได้คืน',hotelShare]);
+    if(taxi)recv.push(['ค่าพาหนะ / Taxi',taxi]);
+    if(otherPersonal)recv.push(['ค่าใช้จ่ายอื่น ๆ',otherPersonal]);
+    const adv=[];
+    if(isHP&&hotelActual)adv.push(['คืนค่าที่พักที่สำรองจ่าย',hotelActual]);
+    if(isFP&&flightActual)adv.push(['คืนค่าเครื่องบินที่สำรองจ่าย',flightActual]);
+    if(isCP&&cA)adv.push(['คืนค่าเช่ารถที่สำรองจ่าย',cA]);
+    if(isUP&&uA)adv.push(['คืนค่าน้ำมันที่สำรองจ่าย',uA]);
+    let pnote='';
+    if(earmark)pnote='ค่าเช่ารถ/น้ำมัน หักจากช่องอื่น ๆ ที่ยืมมา '+fmt(otherRaw)+
+      ' — ใช้จริง '+fmt(cuActual)+(r2(otherRaw-cuActual)>0?' • เหลือคืนบริษัท '+fmt(otherRaw-cuActual):
+      (r2(otherRaw-cuActual)<0?' • เบิกเพิ่ม '+fmt(cuActual-otherRaw):''));
+
+    const net=recv.reduce((a,x)=>a+x[1],0);
+    const advTot=adv.reduce((a,x)=>a+x[1],0);
+    const J=net+advTot;
+    const H=perDiem+D+taxi+otherRaw+(isFP?flightAlloc:0)+(earmark?0:((isCP?cB:0)+(isUP?uB:0)));
+    const I=perDiem+D+taxi+otherPersonal+cuActual+(isFP?flightActual:0)+(isHP?Math.max(0,hotelActual-hotelAlloc):0);
+    return{name:p.name,perDiem,D,taxi,other:otherRaw,otherPersonal,cuActual,cuAlloc,earmark,pnote,
+      H,I,J,net,advTot,recv,adv,K:H-I,isHP,isFP,isCP,isUP,isBorrower:p.name===m.borrower};
+  });
+  const active=rows.filter(r=>!r.empty);
+  const S=k=>active.reduce((a,r)=>a+(r[k]||0),0);
+  const tableTotal=sumPerDiemImg+sumHotelImg+sumAirImg+sumTaxiImg+sumOtherImg;
+  const grandBorrow=tableTotal+(state.cuFromOther?0:(num(state.car.alloc)+num(state.fuel.alloc)));
+  const borrowed=(amountTouch&&num(m.amount))?num(m.amount):grandBorrow;
+  const totalActual=S('I');
+  return{t,count,sumPerDiemImg,sumHotelImg,sumAirImg,sumTaxiImg,sumOtherImg,tableTotal,
+    hotelAlloc,hotelActual,hotelDiff,hotelShare,flightAlloc,flightActual,cB,cA,uB,uA,fromOther,
+    hp,fp,cp,up,rows,active,grandBorrow,borrowed,
+    sumPerDiem:S('perDiem'),sumTaxi:S('taxi'),sumOther:S('other'),sumJ:S('J'),sumI:S('I'),sumNet:S('net'),
+    totalActual,
+    transferOut:active.filter(r=>!r.isBorrower).reduce((a,r)=>a+r.J,0),
+    selfKeep:active.filter(r=>r.isBorrower).reduce((a,r)=>a+r.J,0),
+    retCompany:borrowed-totalActual};
+}
+
+function validate(c){
+  const m=state.meta,ns=state.people.map(p=>p.name.trim()).filter(Boolean);
+  if(!c.count)return{ok:false,msg:'ยังไม่มีรายชื่อ — อัปโหลดรูปหรือเพิ่มคนในขั้นที่ 2'};
+  if(!m.borrower)return{ok:false,msg:'ยังไม่ได้ระบุผู้ถือเงินในขั้นที่ 1'};
+  if(!ns.includes(m.borrower))return{ok:false,msg:'ชื่อผู้ถือเงินไม่ตรงกับรายชื่อในตาราง'};
+  for(const[p,l] of [[c.hp,'ค่าที่พัก'],[c.fp,'ค่าเครื่องบิน'],[c.cp,'ค่าเช่ารถ'],[c.up,'ค่าน้ำมัน']])
+    if(p&&!ns.includes(p))return{ok:false,msg:'ผู้จ่าย'+l+' ('+p+') ไม่มีในรายชื่อ'};
+  if(r2(c.sumJ-c.sumI)!==0)return{ok:false,msg:'ยอดโอนไม่ตรงกับยอดใช้จริง — ตรวจข้อมูลอีกครั้ง'};
+  return{ok:true,msg:'ยอดตรงทั้งหมด พร้อมโอนและเคลียร์กับบริษัท'};
+}
+
+/* ===== ตาราง: สร้างเฉพาะตอนโครงสร้างเปลี่ยน (กันพิมพ์สะดุด) ===== */
+const FIELDS=['perDiem','hotel','airfare','taxi','other'];
+function buildTable(){
+  const tb=$('tb');tb.innerHTML='';
+  state.people.forEach((p,i)=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td');td0.className='l';
+    const inm=document.createElement('input');
+    inm.className='nm';inm.value=p.name;inm.placeholder='ชื่อ-สกุล';inm.setAttribute('list','rosterList');
+    inm.addEventListener('input',()=>{state.people[i].name=inm.value;refreshSelects();updateDerived();});
+    td0.appendChild(inm);tr.appendChild(td0);
+    FIELDS.forEach(f=>{
+      const td=document.createElement('td'),el=document.createElement('input');
+      el.className='money';el.inputMode='decimal';el.value=p[f];
+      el.addEventListener('input',()=>{state.people[i][f]=el.value;updateDerived();});
+      td.appendChild(el);tr.appendChild(td);
+    });
+    const tdx=document.createElement('td');tdx.className='noprint';
+    const bx=document.createElement('button');bx.className='b dgr';bx.textContent='✕';
+    bx.addEventListener('click',()=>delPerson(i));tdx.appendChild(bx);tr.appendChild(tdx);
+    tb.appendChild(tr);
+  });
+}
+
+function updateDerived(){
+  const c=calc(),m=state.meta;
+  $('chips').innerHTML=[['ระยะเวลา',c.t.valid?fmt(c.t.hours)+' ชม.':'—'],
+    ['นับเบี้ยเลี้ยง',c.t.valid?(c.t.days%1?c.t.days.toFixed(1):c.t.days)+' วัน':'—'],
+    ['จำนวนคืน',c.t.valid?c.t.nights+' คืน':'—']]
+    .map(([l,v])=>`<span class="chip">${l} <b>${v}</b></span>`).join('');
+
+  $('tfoot').innerHTML=`<td class="l">รวม ${c.count} คน</td><td>${fmt(c.sumPerDiemImg)}</td>
+    <td>${fmt(c.sumHotelImg)}</td><td>${fmt(c.sumAirImg)}</td><td>${fmt(c.sumTaxiImg)}</td>
+    <td>${fmt(c.sumOtherImg)}</td><td class="noprint"></td>`;
+
+  /* ยอดยืมรวม (ขั้น 2) */
+  $('p2_total').textContent=fmt(c.tableTotal);
+  $('p2_break').textContent='เบี้ยเลี้ยง '+fmt(c.sumPerDiemImg)+' + ที่พัก '+fmt(c.sumHotelImg)+
+    ' + เครื่องบิน '+fmt(c.sumAirImg)+' + พาหนะ '+fmt(c.sumTaxiImg)+' + อื่น ๆ '+fmt(c.sumOtherImg);
+  if(!amountTouch)setVal($('m_amount'),'');
+  $('m_amount').placeholder='ใช้ยอดจากตาราง '+fmt(c.grandBorrow);
+
+  /* ขั้น 3 */
+  $('h_alloc').placeholder='จากรูป '+fmt(c.sumHotelImg);
+  $('f_alloc').placeholder='จากรูป '+fmt(c.sumAirImg);
+  if(!state.hotel.touched)setVal($('h_alloc'),'');
+  if(!state.flight.touched)setVal($('f_alloc'),'');
+  $('cu_fromOther').checked=c.fromOther;
+  $('cAllocWrap').style.display=c.fromOther?'none':'';
+  $('uAllocWrap').style.display=c.fromOther?'none':'';
+  $('x1r').textContent=c.hp?c.hp+' · จ่ายจริง '+fmt(c.hotelActual):'ยังไม่ได้ระบุผู้จ่าย';
+  $('x2r').textContent=c.fp?c.fp+' · จ่ายจริง '+fmt(c.flightActual):'ยังไม่ได้ระบุผู้จ่าย';
+  $('x3r').textContent=(c.cp||c.up)?'จ่ายจริงรวม '+fmt(c.cA+c.uA):'ยังไม่ได้ระบุผู้จ่าย';
+  note('h_note',c.hotelDiff,c.hotelDiff>=0?'เฉลี่ยคืนสมาชิกคนละ '+fmt(c.count?c.hotelDiff/c.count:0):'เบิกบริษัทเพิ่มแล้วโอนให้ '+(c.hp||'ผู้จ่าย'));
+  note('f_note',c.flightAlloc-c.flightActual,(c.flightAlloc-c.flightActual)>=0?'คืนบริษัท':'เบิกเพิ่มแล้วโอนให้ '+(c.fp||'ผู้จ่าย'));
+  const cuAlloc=c.fromOther?(c.rows.filter(r=>!r.empty&&r.earmark).reduce((a,r)=>a+r.other,0)):(c.cB+c.uB);
+  note('cu_note',cuAlloc-(c.cA+c.uA), c.fromOther
+    ? 'วงเงินจากช่องอื่น ๆ '+fmt(cuAlloc)+' · จ่ายจริง '+fmt(c.cA+c.uA)
+    : 'เช่ารถ '+fmt(c.cB-c.cA)+' • น้ำมัน '+fmt(c.uB-c.uA));
+
+  /* ขั้น 4 */
+  $('whoPaid').innerHTML=[['ค่าที่พัก',c.hp,c.hotelActual],['ค่าเครื่องบิน',c.fp,c.flightActual],
+    ['ค่าเช่ารถ',c.cp,c.cA],['ค่าน้ำมัน',c.up,c.uA]]
+    .map(([l,w,a])=>w&&a?`<div class="r"><span class="c">${l}</span><span class="p">${esc(w)}</span><span class="a">${fmt(a)}</span></div>`
+      :`<div class="r none"><span class="c">${l}</span><span class="p">ไม่มีผู้สำรองจ่าย</span><span class="a">—</span></div>`).join('');
+
+  $('payout').innerHTML=c.active.length?c.active.map(r=>`
+    <div class="pcard">
+      <div class="phead">
+        <div class="pname">${esc(r.name)}${r.isBorrower?'<span class="tag self">ผู้ถือเงิน</span>':''}${r.advTot?'<span class="tag adv">สำรองจ่าย</span>':''}</div>
+        <div class="pamt">${fmt(r.J)}</div></div>
+      <div class="plines">
+        ${r.recv.map(([l,v])=>`<div class="pl"><span>${l}</span><span>${fmt(v)}</span></div>`).join('')}
+        ${r.adv.map(([l,v])=>`<div class="pl adv"><span>${l}</span><span>${fmt(v)}</span></div>`).join('')}
+      </div>
+      ${r.pnote?`<div class="pnote">${esc(r.pnote)}</div>`:''}
+      <div class="pnet"><span>${r.advTot?'หักเงินสำรองจ่ายแล้ว ได้รับจริง':'ได้รับจริง'}</span><b>${fmt(r.net)}</b></div>
+    </div>`).join(''):'<p class="m">ยังไม่มีสมาชิก</p>';
+
+  $('s_borrow').textContent=fmt(c.borrowed);
+  $('s_actual').textContent=fmt(c.totalActual);
+  const ret=c.retCompany;
+  $('s_retlabel').textContent=r2(ret)===0?'งบพอดี':(ret>0?'คืนบริษัท':'เบิกเพิ่มจากบริษัท');
+  $('s_ret').textContent=fmt(Math.abs(ret));
+  $('s_ret').className=r2(ret)===0?'':(ret>0?'pos':'neg');
+
+  const v=validate(c),b=$('banner');
+  b.className='banner '+(v.ok?'ok':'bad');
+  b.querySelector('.i').textContent=v.ok?'✓':'!';
+  $('bannerText').textContent=v.msg;
+  autosave();
+}
+function note(id,val,txt){const el=$(id);if(!el)return;const z=r2(val)===0;
+  el.className='note '+(z?'':(val>0?'pos':'neg'));
+  el.textContent=(z?'ส่วนต่าง 0 — พอดี':(val>0?'เหลือ ':'เกิน ')+fmt(Math.abs(val)))+' · '+txt;}
+
+function onMeta(){
+  const m=state.meta;
+  m.activity=$('m_activity').value;m.borrower=$('m_borrower').value;
+  m.dep_d=$('m_dep_d').value;m.dep_t=$('m_dep_t').value;m.ret_d=$('m_ret_d').value;m.ret_t=$('m_ret_t').value;
+  if(amountTouch)m.amount=$('m_amount').value;
+  state.hotel.payer=$('h_payer').value;state.hotel.actual=$('h_actual').value;
+  state.flight.payer=$('f_payer').value;state.flight.actual=$('f_actual').value;
+  if(state.hotel.touched)state.hotel.alloc=$('h_alloc').value;
+  if(state.flight.touched)state.flight.alloc=$('f_alloc').value;
+  state.car.payer=$('c_payer').value;state.car.alloc=$('c_alloc').value;state.car.actual=$('c_actual').value;
+  state.fuel.payer=$('u_payer').value;state.fuel.alloc=$('u_alloc').value;state.fuel.actual=$('u_actual').value;
+  state.cuFromOther=$('cu_fromOther').checked;
+  refreshSelects();updateDerived();
+}
+const touch=w=>{state[w].touched=true;};
+function addPerson(){state.people.push(newPerson());buildTable();refreshSelects();updateDerived();
+  const rs=$('tb').querySelectorAll('tr');rs[rs.length-1]?.querySelector('input')?.focus();}
+function delPerson(i){state.people.splice(i,1);buildTable();refreshSelects();updateDerived();}
+const names=()=>state.people.map(p=>p.name.trim()).filter(Boolean);
+function refreshSelects(){
+  const ns=names();
+  [['h_payer','hotel'],['f_payer','flight'],['c_payer','car'],['u_payer','fuel']].forEach(([id,k])=>{
+    const cur=state[k].payer,val=ns.includes(cur)?cur:'';
+    if(cur&&!ns.includes(cur))state[k].payer='';
+    const el=$(id),want='<option value="">— ไม่มี —</option>'+ns.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    if(el.dataset.sig!==want){el.innerHTML=want;el.dataset.sig=want;}
+    el.value=val;});
+}
+
+function paint(){
+  const m=state.meta;
+  $('m_activity').value=m.activity||'';$('m_borrower').value=m.borrower||'';
+  $('m_dep_d').value=m.dep_d||'';$('m_dep_t').value=m.dep_t||'08:00';
+  $('m_ret_d').value=m.ret_d||'';$('m_ret_t').value=m.ret_t||'17:00';
+  $('h_actual').value=state.hotel.actual||'';$('f_actual').value=state.flight.actual||'';
+  $('c_alloc').value=state.car.alloc||'';$('c_actual').value=state.car.actual||'';
+  $('u_alloc').value=state.fuel.alloc||'';$('u_actual').value=state.fuel.actual||'';
+  $('h_alloc').value=state.hotel.touched?(state.hotel.alloc||''):'';
+  $('f_alloc').value=state.flight.touched?(state.flight.alloc||''):'';
+  $('cu_fromOther').checked=state.cuFromOther!==false;
+  amountTouch=!!(m.amount&&String(m.amount).trim());$('m_amount').value=amountTouch?m.amount:'';
+  const has=!!state.image;
+  $('imgPrev').style.display=has?'block':'none';if(has)$('imgPrev').src=state.image;
+  $('rmImg').style.display=has?'':'none';$('readBtn').style.display=has?'':'none';
+  buildTable();refreshSelects();updateDerived();
+}
+
+function goStep(n){
+  step=Math.max(1,Math.min(4,n));state.step=step;
+  for(let i=1;i<=4;i++)$('page'+i).classList.toggle('active',i===step);
+  [...document.querySelectorAll('.segbtn')].forEach((el,i)=>{
+    el.classList.toggle('on',i+1===step);el.classList.toggle('ok',i+1<step);});
+  $('backBtn').style.visibility=step===1?'hidden':'visible';
+  $('nextBtn').textContent=step===4?'เสร็จสิ้น':'ถัดไป →';
+  $('navHint').textContent=['กรอกกิจกรรมและช่วงเวลาเดินทาง','ตรวจยอดรวมให้ตรงกับรูป',
+    'ระบุผู้สำรองจ่ายและยอดจ่ายจริง',''][step-1];
+  window.scrollTo({top:0,behavior:'smooth'});autosave();
+}
+const nextStep=()=>{step<4?goStep(step+1):(buildText(),toast('เรียบร้อย — บันทึกเป็นรูปส่งไลน์ได้เลย'));};
+const prevStep=()=>{if(step>1)goStep(step-1);};
+
+/* ===== รูป + OCR ===== */
+function readFileToImg(f){const rd=new FileReader();rd.onload=()=>{state.image=rd.result;paint();};rd.readAsDataURL(f);}
+function loadImg(e){const f=e.target.files[0];if(f)readFileToImg(f);e.target.value='';}
+function removeImg(){state.image='';$('ocrStatus').textContent='';paint();}
+const drop=$('drop');
+['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('drag');}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('drag');}));
+drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))readFileToImg(f);});
+window.addEventListener('paste',ev=>{const it=[...(ev.clipboardData||{}).items||[]].find(i=>i.type.startsWith('image/'));if(it)readFileToImg(it.getAsFile());});
+function loadScript(src,ok,fail){if(window.Tesseract)return ok();
+  const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=fail;document.head.appendChild(s);}
+function autoRead(){
+  const st=$('ocrStatus');if(!state.image){st.textContent='ยังไม่มีรูป';return;}
+  $('readBtn').disabled=true;st.innerHTML='<span class="spin"></span>กำลังเตรียมตัวอ่าน…';
+  loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',()=>{
+    st.innerHTML='<span class="spin"></span>กำลังอ่านรูป…';
+    Tesseract.recognize(state.image,'tha+eng',{logger:mm=>{if(mm.status==='recognizing text')
+      st.innerHTML='<span class="spin"></span>กำลังอ่าน '+Math.round(mm.progress*100)+'%';}})
+      .then(({data})=>{const ppl=parseOcrText(data.text);$('readBtn').disabled=false;
+        if(!ppl.length){st.textContent='อ่านไม่พบตาราง — ลองรูปที่ชัดขึ้น หรือกดเพิ่มคนแล้วกรอกเอง';return;}
+        state.people=ppl;buildTable();refreshSelects();updateDerived();
+        $('tb').querySelectorAll('tr').forEach(tr=>tr.classList.add('flash'));
+        st.innerHTML='อ่านได้ <b>'+ppl.length+' คน</b> — ตรวจยอดรวมให้ตรงกับรูป';})
+      .catch(e=>{$('readBtn').disabled=false;st.textContent='อ่านไม่สำเร็จ: '+(e.message||e);});
+  },()=>{$('readBtn').disabled=false;st.textContent='โหลดตัวอ่านไม่สำเร็จ (ออฟไลน์?) — กรอกเองได้';});
+}
+const parseMoney=s=>parseInt(String(s).replace(/[^\d.,]/g,'').replace(/([.,]\d{1,2})$/,'').replace(/[.,]/g,'')||'0',10)||0;
+function extractMoney(l){const o=[];(l.match(/\d[\d.,]*/g)||[]).forEach(t=>{const v=parseMoney(t);if(v>=100&&v<=99999)o.push(v);});return o;}
+const normName=s=>String(s).replace(/\s+/g,'').replace(/(นางสาว|น\.ส\.|นาง|นาย|ว่าที่ร้อยตรี|ดร\.)/g,'').replace(/[^฀-๿]/g,'');
+function approxSub(pat,text){const m=pat.length,n=text.length;if(!m)return 0;if(!n)return m;
+  let pr=Array(n+1).fill(0),cu=Array(n+1).fill(0);
+  for(let i=1;i<=m;i++){cu[0]=i;for(let j=1;j<=n;j++)cu[j]=Math.min(pr[j]+1,cu[j-1]+1,pr[j-1]+(pat[i-1]===text[j-1]?0:1));[pr,cu]=[cu,pr];}
+  return Math.min(...pr);}
+function matchRoster(raw){const t=normName(raw);if(t.length<3)return null;let best=null,bs=0;
+  for(const nm of DEFAULT_ROSTER){const p=normName(nm),sim=1-approxSub(p,t)/p.length;if(sim>bs){bs=sim;best=nm;}}
+  return bs>=.6?best:null;}
+const cleanRaw=s=>String(s).replace(/^[\s\d.\-]+/,'').replace(/(หัวหน้า|พนักงาน|ปฏิบัติงาน|นักวิชาการ|ระดับ|ประเทศ|ไทย|ผู้).*$/,'').trim();
+function parseOcrText(text){
+  const bad=/(งบ|เดินทาง|คงเหลือ|ประมาณ|ระดับสิทธิ|ลำดับ|รวม|ยืมได|บาท)/;
+  const out=[];let pending='';
+  for(const line of text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean)){
+    const nums=extractMoney(line),thai=(line.match(/[฀-๿]+/g)||[]).join(' ').trim();
+    if(nums.length>=3){
+      const raw=(thai.replace(/\s+/g,'').length>=4)?thai:pending;
+      if(!raw||normName(raw).length<2||bad.test(raw)){pending='';continue;}
+      const[perDiem,hotel,airfare,taxi,other]=[0,1,2,3,4].map(i=>nums[i]!=null?String(nums[i]):'');
+      out.push({name:matchRoster(raw)||cleanRaw(raw)||('คนที่ '+(out.length+1)),perDiem,hotel,airfare,taxi,other});
+      pending='';
+    }else if(thai&&!nums.length&&thai.replace(/\s+/g,'').length<=30&&!bad.test(thai))pending=thai;
+  }
+  return out;
+}
+
+/* ===== EXPORT JPG (วาดเองบน canvas — ไม่ง้อไลบรารี ใช้ออฟไลน์ได้) ===== */
+async function exportJpg(){
+  const c=calc();
+  if(!c.active.length){toast('ยังไม่มีข้อมูลให้บันทึก');return;}
+  try{await document.fonts.ready;}catch(e){}
+  const F='-apple-system,BlinkMacSystemFont,"Segoe UI Variable","Segoe UI","Sarabun","Noto Sans Thai",sans-serif';
+  const W=920,PAD=44,S=2;
+  const m=state.meta;
+  // ---- วัดความสูงก่อน ----
+  const blocks=c.active.map(r=>{
+    const lines=r.recv.length+r.adv.length;
+    return{r,h:34+lines*27+(r.pnote?34:0)+16+34};   // head + lines + note + rule + net
+  });
+  const headH=m.activity?128:104;
+  const H=PAD+headH+blocks.reduce((a,b)=>a+b.h+16,0)-16+PAD;
+  const cv=document.createElement('canvas');
+  cv.width=W*S;cv.height=H*S;
+  const x=cv.getContext('2d');x.scale(S,S);
+  const rrect=(px,py,pw,ph,rad)=>{x.beginPath();
+    if(x.roundRect)x.roundRect(px,py,pw,ph,rad);
+    else{x.moveTo(px+rad,py);x.arcTo(px+pw,py,px+pw,py+ph,rad);x.arcTo(px+pw,py+ph,px,py+ph,rad);
+      x.arcTo(px,py+ph,px,py,rad);x.arcTo(px,py,px+pw,py,rad);x.closePath();}};
+  const T=(t,px,py,size,weight,color,align)=>{x.font=(weight||400)+' '+size+'px '+F;
+    x.fillStyle=color||'#1d1d1f';x.textAlign=align||'left';x.textBaseline='alphabetic';x.fillText(t,px,py);};
+  // พื้นหลัง
+  x.fillStyle='#f5f5f7';x.fillRect(0,0,W,H);
+  let y=PAD;
+  // หัวเรื่อง
+  T('ยอดโอนให้แต่ละคน',PAD,y+30,29,700,'#1d1d1f');
+  y+=52;
+  if(m.activity){T(m.activity,PAD,y+8,17,600,'#0071e3');y+=26;}
+  const sub=[];
+  if(m.dep_d&&m.ret_d)sub.push(thDate(m.dep_d)+' – '+thDate(m.ret_d));
+  if(c.t.valid)sub.push((c.t.days%1?c.t.days.toFixed(1):c.t.days)+' วัน / '+c.t.nights+' คืน');
+  if(m.borrower)sub.push('ผู้ถือเงิน: '+m.borrower);
+  T(sub.join('  •  '),PAD,y+8,14,400,'#6e6e73');
+  y+=34;
+  // การ์ดรายคน
+  blocks.forEach(({r,h})=>{
+    x.fillStyle='#ffffff';rrect(PAD,y,W-PAD*2,h,15);x.fill();
+    x.strokeStyle='#e3e3e6';x.lineWidth=1;rrect(PAD,y,W-PAD*2,h,15);x.stroke();
+    const L=PAD+22,R=W-PAD-22;let cy=y+30;
+    T(r.name,L,cy,17.5,700,'#1d1d1f');
+    let tw=x.measureText(r.name).width;
+    if(r.isBorrower){x.fillStyle='#e8f1fd';rrect(L+tw+9,cy-13,68,19,10);x.fill();
+      T('ผู้ถือเงิน',L+tw+15,cy-0.5,11.5,700,'#0058b0');tw+=77;}
+    if(r.advTot){x.fillStyle='#fff6e5';rrect(L+tw+9,cy-13,74,19,10);x.fill();
+      T('สำรองจ่าย',L+tw+15,cy-0.5,11.5,700,'#a15c00');}
+    T(fmt(r.J),R,cy+1,21,700,'#1d1d1f','right');
+    cy+=25;
+    r.recv.forEach(([l,v])=>{T(l,L,cy,14,400,'#6e6e73');T(fmt(v),R,cy,14,500,'#1d1d1f','right');cy+=27;});
+    r.adv.forEach(([l,v])=>{T(l,L,cy,14,500,'#a15c00');T(fmt(v),R,cy,14,600,'#a15c00','right');cy+=27;});
+    if(r.pnote){x.fillStyle='#f5f5f7';rrect(L,cy-13,R-L,26,8);x.fill();
+      T(r.pnote,L+10,cy+4,11.5,400,'#86868b');cy+=34;}
+    cy+=4;
+    x.strokeStyle='#e3e3e6';x.beginPath();x.setLineDash([4,4]);
+    x.moveTo(L,cy-9);x.lineTo(R,cy-9);x.stroke();x.setLineDash([]);
+    T(r.advTot?'หักเงินสำรองจ่ายแล้ว ได้รับจริง':'ได้รับจริง',L,cy+13,14,500,'#1d1d1f');
+    T(fmt(r.net),R,cy+14,17,700,'#1d9d5a','right');
+    y+=h+16;
+  });
+  // เซฟ
+  const name=((m.activity||'ยอดโอน')+'.jpg').replace(/[\\/:*?"<>|]/g,'_');
+  cv.toBlob(b=>{if(!b){toast('บันทึกรูปไม่สำเร็จ');return;}
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('บันทึกรูปแล้ว — ส่งเข้ากลุ่มไลน์ได้เลย');
+  },'image/jpeg',.95);
+}
+
+/* ===== save / load ===== */
+const autosave=()=>{try{localStorage.setItem('clearing_v5',JSON.stringify(state));}catch(e){}};
+function saveFile(){onMeta();state.step=step;
+  const nm=(state.meta.activity||'เคลียร์เงินยืม').replace(/[\\/:*?"<>|]/g,'_');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,1)],{type:'application/json'}));
+  a.download=nm+'.json';a.click();URL.revokeObjectURL(a.href);toast('บันทึกไฟล์งานแล้ว');}
+function openFile(e){const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{try{const s=JSON.parse(rd.result);if(!s.meta||!Array.isArray(s.people))throw 0;
+    state=Object.assign(blankState(),s);state.meta=Object.assign(blankState().meta,s.meta);
+    paint();goStep(s.step||1);toast('เปิดไฟล์งานแล้ว');}catch(_){alert('ไฟล์ไม่ถูกต้อง');}};
+  rd.readAsText(f);e.target.value='';}
+function newProject(){if(!confirm('เริ่มใหม่? ข้อมูลที่ยังไม่บันทึกจะหาย'))return;
+  state=blankState();for(let i=0;i<5;i++)state.people.push(newPerson());amountTouch=false;paint();goStep(1);}
+
+/* ===== export text/csv ===== */
+const thDate=d=>{if(!d)return'';const[y,m,x]=d.split('-');return x+'/'+m+'/'+(+y+543);};
+function buildText(){
+  const c=calc(),m=state.meta,v=validate(c),L=[];
+  L.push('สรุปเคลียร์เงินยืม — '+(m.activity||'(ไม่ระบุ)'));
+  if(m.dep_d&&m.ret_d)L.push(thDate(m.dep_d)+' – '+thDate(m.ret_d)+' ('+(c.t.days%1?c.t.days.toFixed(1):c.t.days)+' วัน / '+c.t.nights+' คืน)');
+  L.push('ผู้ถือเงิน: '+(m.borrower||'-')+' • ยืมมา '+fmt(c.borrowed)+' บาท');
+  const who=[['ค่าที่พัก',c.hp,c.hotelActual],['ค่าเครื่องบิน',c.fp,c.flightActual],['ค่าเช่ารถ',c.cp,c.cA],['ค่าน้ำมัน',c.up,c.uA]].filter(w=>w[1]&&w[2]);
+  if(who.length){L.push('');L.push('ผู้สำรองจ่าย:');who.forEach(([l,p,a])=>L.push('• '+l+' — '+p+' '+fmt(a)));}
+  L.push('');L.push('ยอดโอนให้แต่ละคน:');
+  c.active.forEach((r,i)=>{
+    L.push((i+1)+'. '+r.name+(r.isBorrower?' (เก็บไว้เอง)':'')+' — โอน '+fmt(r.J));
+    r.recv.forEach(([l,v2])=>L.push('     · '+l+' '+fmt(v2)));
+    r.adv.forEach(([l,v2])=>L.push('     · '+l+' '+fmt(v2)));
+    L.push('     → ได้รับจริง '+fmt(r.net));});
+  L.push('');L.push('รวมโอนออก '+fmt(c.transferOut)+' • ผู้ถือเงินเก็บเอง '+fmt(c.selfKeep));
+  const ret=c.retCompany;
+  L.push(r2(ret)===0?'งบพอดี':(ret>0?'คืนบริษัท '+fmt(ret):'เบิกเพิ่มจากบริษัท '+fmt(-ret)));
+  L.push('');L.push(v.ok?'✓ ยอดตรง':'! '+v.msg);
+  $('shareText').value=L.join('\n');return $('shareText').value;
+}
+function copyText(){const t=buildText();
+  navigator.clipboard.writeText(t).then(()=>toast('คัดลอกแล้ว')).catch(()=>{$('shareText').select();document.execCommand('copy');toast('คัดลอกแล้ว');});}
+function exportCsv(){const c=calc();
+  const rows=[['ที่','ชื่อ','เบี้ยเลี้ยง','ค่าที่พัก','ค่าเครื่องบิน','ค่าพาหนะ','อื่นๆ','สำรองจ่าย','ยอดโอน','ได้รับจริง']];
+  c.rows.forEach((r,i)=>{if(r.empty)return;const p=state.people[i];
+    rows.push([i+1,r.name,num(p.perDiem),num(p.hotel),num(p.airfare),num(p.taxi),num(p.other),r2(r.advTot),r2(r.J),r2(r.net)]);});
+  rows.push(['','รวม',c.sumPerDiemImg,c.sumHotelImg,c.sumAirImg,c.sumTaxiImg,c.sumOtherImg,'',r2(c.sumJ),r2(c.sumNet)]);
+  const csv='﻿'+rows.map(r=>r.map(v=>{const s=String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=((state.meta.activity||'สรุป')+'.csv').replace(/[\\/:*?"<>|]/g,'_');a.click();URL.revokeObjectURL(a.href);}
+function printSummary(){buildText();goStep(4);setTimeout(()=>window.print(),120);}
+function toast(m){const d=document.createElement('div');d.textContent=m;
+  d.style.cssText='position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:rgba(29,29,31,.94);color:#fff;padding:11px 20px;border-radius:980px;z-index:99;font-size:13.5px;font-weight:600';
+  document.body.appendChild(d);setTimeout(()=>d.remove(),2200);}
+
+(function init(){
+  try{const s=localStorage.getItem('clearing_v5');if(s)state=Object.assign(blankState(),JSON.parse(s));}catch(e){}
+  if(!state){state=blankState();for(let i=0;i<5;i++)state.people.push(newPerson());}
+  if(!state.people.length)for(let i=0;i<5;i++)state.people.push(newPerson());
+  $('rosterList').innerHTML=DEFAULT_ROSTER.map(n=>`<option value="${esc(n)}">`).join('');
+  paint();goStep(state.step||1);
+})();
+</script>
+</body>
+</html>
