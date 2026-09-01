@@ -608,11 +608,12 @@ async function autoRead(){
     const mt=(state.image.match(/data:([^;]+)/)||[])[1]||'image/jpeg';
     const body={contents:[{parts:[
       {inlineData:{mimeType:mt,data:b64}},
-      {text:'ดูตารางในรูปนี้ แล้วแยกข้อมูลรายคนออกมาเป็น JSON array\n'
-        +'คอลัมน์ตามลำดับ: ชื่อ-สกุล, เบี้ยเลี้ยง, ค่าที่พัก, ค่าเครื่องบิน, ค่าพาหนะ, อื่นๆ\n'
-        +'ตอบเฉพาะ JSON เท่านั้น ตัวอย่าง:\n'
-        +'[{"name":"นายสมชาย ใจดี","perDiem":"4800","hotel":"4500","airfare":"7040","taxi":"620","other":"0"}]\n'
-        +'กฎ: ใส่ชื่อเต็มรวมคำนำหน้า ตัวเลขเป็น string ไม่คั่นหลัก 0 ถ้าไม่มี ข้ามแถวรวม/สรุป'}
+      {text:'ดูตารางค่าใช้จ่ายในรูปนี้ อ่านหัวคอลัมน์ตัวเลขจากรูป แล้วแยกข้อมูลรายคนออกมาเป็น JSON array\n'
+        +'แต่ละคนมี field: name (ชื่อ-สกุลเต็มรวมคำนำหน้า), perDiem (เบี้ยเลี้ยง), hotel (ที่พัก), airfare (โดยสาร/เครื่องบิน), taxi (พาหนะ), other (อื่นๆ)\n'
+        +'ถ้าคอลัมน์ในรูปชื่อต่างกัน ให้ map เข้า field ที่ใกล้เคียงที่สุด\n'
+        +'ตอบเฉพาะ JSON array เท่านั้น ห้ามมีข้อความอื่น ตัวอย่าง:\n'
+        +'[{"name":"นายสมชาย ใจดี","perDiem":"6000","hotel":"6000","airfare":"7200","taxi":"600","other":"0"}]\n'
+        +'กฎ: ตัวเลขเป็น string ไม่คั่นหลัก ไม่มีทศนิยม ใส่ "0" ถ้าช่องว่าง ข้ามแถวรวม/สรุป/total'}
     ]}],generationConfig:{temperature:0,maxOutputTokens:2048}};
     const ep='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
     const res=await fetch(ep+'?key='+GEMINI_KEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
