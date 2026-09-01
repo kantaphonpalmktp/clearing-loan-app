@@ -184,16 +184,16 @@
   <!-- STEP 2 -->
   <section class="page card" id="page2">
     <h2>รายชื่อ + ยอด</h2>
-    <p class="sub">อัปโหลดรูปแล้วกด “อ่านรูปลงตาราง” — ระบบจะเติมชื่อและยอดให้ จากนั้นเทียบยอดรวมกับรูปเพื่อยืนยัน</p>
+    <p class="sub">อัปโหลดหรือถ่ายภาพหน้าจอระบบเบิกค่าใช้จ่ายแล้วกด “อ่านรูปลงตาราง” — ระบบจะเติมชื่อและยอดให้ จากนั้นเทียบยอดรวมกับรูปเพื่อยืนยัน</p>
     <div class="drop" id="drop" onclick="document.getElementById('imgFile').click()">
       <div><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></div>
       <b>คลิกหรือวางรูปที่นี่</b>
-      <div class="m">.png .jpg — ใช้ Gemini AI อ่านตัวเลขแม่นยำ</div>
+      <div class="m">อัพโลหดไฟล์ภาพ .png .jpg หรือถ่ายภาพ</div>
       <input type="file" id="imgFile" accept="image/*" style="display:none" onchange="loadImg(event)">
     </div>
     <img id="imgPrev" alt="">
     <div class="row" style="margin-top:13px">
-      <button class="b pri" id="readBtn" onclick="autoRead()" style="display:none">อ่านรูปลงตาราง</button>
+      <button class="b pri" id="readBtn" onclick="autoRead()" style="display:none">ดึงข้อมูลจากรูปลงตาราง</button>
       <button class="b sm" id="rmImg" onclick="removeImg()" style="display:none">ลบรูป</button>
       <span class="m" id="ocrStatus"></span>
     </div>
@@ -602,7 +602,7 @@ async function autoRead(){
   const st=$('ocrStatus');
   if(!state.image){st.textContent='ยังไม่มีรูป';return;}
   $('readBtn').disabled=true;
-  st.innerHTML='<span class="spin"></span>กำลังอ่านรูปด้วย Gemini AI…';
+  st.innerHTML='<span class="spin"></span>กำลังใช้พลังจิตวิเคราะห์ภาพ …';
   try{
     const b64=state.image.split(',')[1];
     const mt=(state.image.match(/data:([^;]+)/)||[])[1]||'image/jpeg';
