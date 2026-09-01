@@ -614,7 +614,7 @@ async function autoRead(){
         +'ตอบเฉพาะ JSON array เท่านั้น ห้ามมีข้อความอื่น ตัวอย่าง:\n'
         +'[{"name":"นายสมชาย ใจดี","perDiem":"6000","hotel":"6000","airfare":"7200","taxi":"600","other":"0"}]\n'
         +'กฎ: ตัวเลขเป็น string ไม่คั่นหลัก ไม่มีทศนิยม ใส่ "0" ถ้าช่องว่าง ข้ามแถวรวม/สรุป/total'}
-    ]}],generationConfig:{temperature:0,maxOutputTokens:2048}};
+    ]}],generationConfig:{temperature:0,maxOutputTokens:8192}};
     const ep='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
     const res=await fetch(ep+'?key='+GEMINI_KEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const er=await res.json().catch(()=>({}));throw new Error(er.error?.message||'HTTP '+res.status);}
